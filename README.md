@@ -10,7 +10,6 @@ Casual Cup aims to create accessible, low friction tournaments in a casual setti
 
 ![UI proposal](docs/img/ui-idea.png)
 
-<br>
 
 # Color palette
 

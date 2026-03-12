@@ -1,0 +1,16 @@
+.v-application .my-toolbar .v-toolbar__content {
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+.v-application .my-toolbar {
+  background:  #06D6A0;
+}
+
+.editable-headline-display {
+  font-size: 40px; 
+  font-weight: 600;
+  color: #333;
+  font-family: "Roboto", sans-serif;
+  cursor: pointer;
+}

@@ -3,6 +3,7 @@ export default defineNuxtConfig({
   ssr: false,
   devtools: { enabled: false },
   css: [
+    '@/assets/scss/main.scss',
     'vuetify/styles',
     '@mdi/font/css/materialdesignicons.min.css',
   ],

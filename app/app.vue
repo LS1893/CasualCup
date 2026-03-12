@@ -1,28 +1,26 @@
 <template>
   <v-app>
-    <!-- Toolbar at the top of the screen -->
-    <v-app-bar color="primary" height="48">
-      <!-- Title of the application with adjusted margin and font size -->
-      <v-app-bar-title class="text-h6 ms-3">
-        
 
-        <span class="ms-1">Header</span>
+    <!-- Toolbar -->
+    <v-app-bar class="my-toolbar" height="96" app>
+      <v-app-bar-title class="text-h3">
+        
+        <v-container>
+          <v-row>
+            <v-col cols="4"><v-img src="/images/CasualCup.png"
+              alt="Logo"
+              max-width="120"
+              contain/>
+            </v-col>
+            <v-col cols="8"><EditableHeadline/></v-col>
+          </v-row>
+        </v-container>
       </v-app-bar-title>
     </v-app-bar>
 
-    <!-- Main content of the application -->
+    <!-- main content -->
     <v-main>
       <NuxtPage />
     </v-main>
   </v-app>
 </template>
-
-<!--
-<template>
-  <div>
-    <NuxtRouteAnnouncer />
-    <NuxtWelcome />
-    
-  </div>
-</template>
--->

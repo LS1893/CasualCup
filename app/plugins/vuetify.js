@@ -9,9 +9,9 @@ export default defineNuxtPlugin((nuxtApp) => {
     themes: {
       light: {
         colors: {
-          primary: '#869aad',
-          secondary: '#dcf0f0',
-          accent: '#82B1FF',
+          primary: '#EA2425',
+          secondary: '#048A81',
+          accent: '#06D6A0',
           error: '#FF5252',
           info: '#2196F3',
           success: '#4CAF50',
@@ -20,9 +20,9 @@ export default defineNuxtPlugin((nuxtApp) => {
       },
       dark: {
         colors: {
-          primary: '#04203a',
-          secondary: '#dcf0f0',
-          accent: '#82B1FF',
+          primary: '#EA2425',
+          secondary: '#048A81',
+          accent: '#06D6A0',
           error: '#FF5252',
           info: '#2196F3',
           success: '#4CAF50',
