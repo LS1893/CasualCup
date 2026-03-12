@@ -8,4 +8,16 @@ Casual Cup aims to create accessible, low friction tournaments in a casual setti
 - tournament data is (for now) stored in the browsers localStorage
 
 
-![UI Vorschlag](docs/img/ui-idea.png)
+![UI proposal](docs/img/ui-idea.png)
+
+<br>
+
+# Color palette
+
+the colors for this application are not up for debate! They originate from seconds of intense research on coolors.co, where i inserted the red shade from the cup seen in the logo, that i found on a random stock image page online. 
+
+![Color palette](docs/img/color-palette.png)
+
+Red: #EA2425    
+Dark cyan: #048A81  
+Emerald: #06D6A0
