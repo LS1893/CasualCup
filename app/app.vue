@@ -1,7 +1,7 @@
 <template>
   <v-app>
 
-    <!-- Toolbar -->
+    <!-- toolbar -->
     <v-app-bar class="my-toolbar" height="96" app>
       <v-app-bar-title class="text-h3">
         
