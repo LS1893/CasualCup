@@ -2,6 +2,7 @@
 import {FinalScore} from "~/domain/match/FinalScore.ts";
 import {Player} from "~/domain/player/Player.ts";
 
+const matchDialog = ref(false)
 const { headers, items} = calculateScoreTable()
 const players: Player[] = [
     new Player(1, "Gernot", 1000),
@@ -15,6 +16,36 @@ const matches = ref([
     new FinalScore([players[1], players[2]], 5, [players[0], players[3]], 1),
     new FinalScore([players[1], players[3]], 2, [players[0], players[2]], 6),
 ])
+const teamA = ref([players[0]])
+const teamB = ref([players[1]])
+const teamAscore = ref(0)
+const teamBscore = ref(0)
+const defaultA = players[0] as Player
+const defaultB = players[2] as Player
+
+const loadingSaveMatch = ref(false)
+
+function closeDialog() {
+  matchDialog.value = false
+  teamA.value = [defaultA]
+  teamAscore.value = 0
+  teamB.value = [defaultB]
+  teamBscore.value = 0
+}
+
+async function saveDialog(a: Player[], aScore: number, b: Player[], bScore: number) {
+  loadingSaveMatch.value = true
+  try {
+    // TODO values are not quite right here yet
+    const score = new FinalScore(a, aScore, b, bScore);
+    matches.value.push(score)
+  } catch (e) {
+    // TODO print error, maybe use snackbar
+  } finally {
+    closeDialog();
+    loadingSaveMatch.value = false
+  }
+}
 </script>
 
 <template>
@@ -36,7 +67,100 @@ const matches = ref([
       </v-col>
       <v-col cols="6">
         <v-container>
-          <Scorecard v-for="score in matches" :score="score" class="mb-3"/>
+          <v-row dense>
+            <v-col dense>
+              <v-dialog max-width="500" v-model="matchDialog" persistent>
+                <v-overlay
+                    :model-value="loadingSaveMatch"
+                    class="align-center justify-center"
+                    scrim="#036358"
+                    contained
+                >
+                  <v-progress-circular indeterminate />
+                </v-overlay>
+                <template v-slot:activator="{ props: activatorProps }">
+                  <v-btn
+                      v-bind="activatorProps"
+                      color="surface-variant"
+                      text="Neues Match"
+                      variant="flat"
+                  ></v-btn>
+                </template>
+                <v-card>
+                  <v-card-title>Neues Match eintragen</v-card-title>
+                  <v-container density="comfortable">
+                    <v-row>
+                      <v-col>
+                        Team A:
+                      </v-col>
+                    </v-row>
+                    <v-row>
+                      <v-col>
+                        <v-number-input
+                            reverse
+                            controlVariant="default"
+                            label="Score Team A"
+                            :hideInput="false"
+                            :inset="false"
+                            variant="outlined"
+                            v-model="teamAscore"
+                        />
+                      </v-col>
+                    </v-row>
+                    <v-row v-for="(_, i) in teamA" density="comfortable">
+                      <v-col density="comfortable">
+                        <v-select v-model="teamA[i]" :items="players" item-title="name" :label="`Team A Spieler ${i+1}`"></v-select>
+                      </v-col>
+                    </v-row>
+                    <v-row density="comfortable">
+                      <v-col density="comfortable">
+                        <v-btn icon="mdi-plus" color="primary" @click="teamA.push(players[0])"></v-btn>
+                      </v-col>
+                    </v-row>
+                    <v-divider />
+                    <v-row>
+                      <v-col>
+                        Team B:
+                      </v-col>
+                    </v-row>
+                    <v-row>
+                      <v-col>
+                        <v-number-input
+                            reverse
+                            controlVariant="default"
+                            label="Score Team A"
+                            :hideInput="false"
+                            :inset="false"
+                            variant="outlined"
+                            v-model="teamBscore"
+                        />
+                      </v-col>
+                    </v-row>
+                    <v-row v-for="(_, i) in teamB" density="comfortable">
+                      <v-col density="comfortable">
+                        <v-select v-model="teamB[i]" :items="players" item-title="name" :label="`Team B Spieler ${i+1}`"></v-select>
+                      </v-col>
+                    </v-row>
+                    <v-row density="comfortable">
+                      <v-col density="comfortable">
+                        <v-btn icon="mdi-plus" color="primary" @click="teamB.push(players[0])"></v-btn>
+                      </v-col>
+                    </v-row>
+                  </v-container>
+                  <v-card-actions>
+                    <v-spacer />
+                    <v-btn dense variant="outlined" color="alert" @click="closeDialog">Abbruch</v-btn>
+                    <v-btn dense variant="tonal" color="primary" @click="saveDialog(teamA, teamAscore, teamB, teamBscore)">Speichern</v-btn>
+                  </v-card-actions>
+                </v-card>
+              </v-dialog>
+            </v-col>
+          </v-row>
+          <v-row dense>
+            <v-col dense>
+              <Scorecard v-for="score in matches" :score="score" class="mb-3"/>
+            </v-col>
+          </v-row>
         </v-container>
       </v-col>
     </v-row>
