@@ -84,17 +84,18 @@ async function saveDialog(a: Player[], aScore: number, b: Player[], bScore: numb
                       color="surface-variant"
                       text="Neues Match"
                       variant="flat"
+                      block
                   ></v-btn>
                 </template>
                 <v-card>
-                  <v-card-title>Neues Match eintragen</v-card-title>
+                  <v-card-title><b>Neues Match eintragen</b></v-card-title>
                   <v-container density="comfortable">
                     <v-row>
                       <v-col>
-                        Team A:
+                        <b>Team A:</b>
                       </v-col>
                     </v-row>
-                    <v-row>
+                    <v-row class="mt-2">
                       <v-col>
                         <v-number-input
                             reverse
@@ -107,25 +108,18 @@ async function saveDialog(a: Player[], aScore: number, b: Player[], bScore: numb
                         />
                       </v-col>
                     </v-row>
-                    <!--
-                    <v-row v-for="(_, i) in teamA" density="comfortable">
-                      <v-col density="comfortable">
-                        <v-select v-model="teamA[i]" :items="players" item-title="name" :label="`Team A Spieler ${i+1}`"></v-select>
-                      </v-col>
-                    </v-row>
-                    -->
-                    <v-row density="comfortable">
+                    <v-row density="comfortable" class="mt-2">
                       <v-col density="comfortable">
                         <v-select v-model="teamA" :items="players" multiple return-object item-title="name" :label="`Team A Spieler`"></v-select>
                       </v-col>
                     </v-row>
-                    <v-divider />
-                    <v-row>
+                    <v-divider class="mb-3 mt-1"/>
+                    <v-row class="mt-2">
                       <v-col>
-                        Team B:
+                        <b>Team B:</b>
                       </v-col>
                     </v-row>
-                    <v-row>
+                    <v-row class="mt-2">
                       <v-col>
                         <v-number-input
                             reverse
@@ -138,7 +132,7 @@ async function saveDialog(a: Player[], aScore: number, b: Player[], bScore: numb
                         />
                       </v-col>
                     </v-row>
-                    <v-row density="comfortable">
+                    <v-row density="comfortable" class="mt-2">
                       <v-col density="comfortable">
                         <v-select v-model="teamB" :items="players" multiple return-object item-title="name" :label="`Team B Spieler`"></v-select>
                       </v-col>
