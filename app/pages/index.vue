@@ -16,28 +16,28 @@ const matches = ref([
     new FinalScore([players[1], players[2]], 5, [players[0], players[3]], 1),
     new FinalScore([players[1], players[3]], 2, [players[0], players[2]], 6),
 ])
-const teamA = ref([players[0]])
-const teamB = ref([players[1]])
+const teamA = ref([])
+const teamB = ref([])
 const teamAscore = ref(0)
 const teamBscore = ref(0)
-const defaultA = players[0] as Player
-const defaultB = players[2] as Player
+const defaultA = []
+const defaultB = []
 
 const loadingSaveMatch = ref(false)
 
 function closeDialog() {
   matchDialog.value = false
-  teamA.value = [defaultA]
+  teamA.value = [...defaultA]
   teamAscore.value = 0
-  teamB.value = [defaultB]
+  teamB.value = [...defaultB]
   teamBscore.value = 0
 }
 
 async function saveDialog(a: Player[], aScore: number, b: Player[], bScore: number) {
   loadingSaveMatch.value = true
   try {
-    // TODO values are not quite right here yet
-    const score = new FinalScore(a, aScore, b, bScore);
+    debugger
+    const score = new FinalScore([...teamA.value], teamAscore.value, [...teamB.value], teamBscore.value);
     matches.value.push(score)
   } catch (e) {
     // TODO print error, maybe use snackbar
@@ -107,14 +107,16 @@ async function saveDialog(a: Player[], aScore: number, b: Player[], bScore: numb
                         />
                       </v-col>
                     </v-row>
+                    <!--
                     <v-row v-for="(_, i) in teamA" density="comfortable">
                       <v-col density="comfortable">
                         <v-select v-model="teamA[i]" :items="players" item-title="name" :label="`Team A Spieler ${i+1}`"></v-select>
                       </v-col>
                     </v-row>
+                    -->
                     <v-row density="comfortable">
                       <v-col density="comfortable">
-                        <v-btn icon="mdi-plus" color="primary" @click="teamA.push(players[0])"></v-btn>
+                        <v-select v-model="teamA" :items="players" multiple return-object item-title="name" :label="`Team A Spieler`"></v-select>
                       </v-col>
                     </v-row>
                     <v-divider />
@@ -136,14 +138,9 @@ async function saveDialog(a: Player[], aScore: number, b: Player[], bScore: numb
                         />
                       </v-col>
                     </v-row>
-                    <v-row v-for="(_, i) in teamB" density="comfortable">
-                      <v-col density="comfortable">
-                        <v-select v-model="teamB[i]" :items="players" item-title="name" :label="`Team B Spieler ${i+1}`"></v-select>
-                      </v-col>
-                    </v-row>
                     <v-row density="comfortable">
                       <v-col density="comfortable">
-                        <v-btn icon="mdi-plus" color="primary" @click="teamB.push(players[0])"></v-btn>
+                        <v-select v-model="teamB" :items="players" multiple return-object item-title="name" :label="`Team B Spieler`"></v-select>
                       </v-col>
                     </v-row>
                   </v-container>
