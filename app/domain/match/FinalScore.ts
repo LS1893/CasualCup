@@ -1,12 +1,15 @@
-import type {Player} from "~/domain/player/Player";
+import type { Player } from "~/domain/player/Player";
+import { v4 as uuidv4 } from 'uuid';
 
 export class FinalScore {
+    id: string;
     aPlayers: Player[];
     aScore: number;
     bPlayers: Player[];
     bScore: number;
 
     constructor(aPlayers: Player[], aScore: number, bPlayers: Player[], bScore: number) {
+        this.id = uuidv4();
         this.aPlayers = aPlayers;
         this.aScore = aScore;
         this.bPlayers = bPlayers;
@@ -30,7 +33,7 @@ export class FinalScore {
     }
 
     private avgRating(players: Player[]): number {
-        return players.map( it => it.rating).reduce(
+        return players.map(it => it.rating).reduce(
             (accumulator, currentValue) => accumulator + currentValue,
             0,
         ) / players.length;

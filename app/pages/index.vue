@@ -1,21 +1,19 @@
 <script setup lang="ts">
 import {FinalScore} from "~/domain/match/FinalScore.ts";
 import {Player} from "~/domain/player/Player.ts";
+import Scorecard from "~/components/Scorecard.vue";
+import { initParser } from '~/composables/playerService';
 
 const matchDialog = ref(false)
 const { headers, items} = calculateScoreTable()
-const players: Player[] = [
-    new Player(1, "Gernot", 1000),
-    new Player(2, "Hafermoped", 1000),
-    new Player(3, "Nascher", 1000),
-    new Player(4, "Chicksterminator", 1000),
-]
-const a = players[0]
-const matches = ref([
-    new FinalScore([players[0], players[1]], 6, [players[2], players[3]], 4),
-    new FinalScore([players[1], players[2]], 5, [players[0], players[3]], 1),
-    new FinalScore([players[1], players[3]], 2, [players[0], players[2]], 6),
-])
+const players = ref([]);
+
+onMounted(() => {
+  players.value = initParser.parseInitPlayers();
+  console.log('Initial geladene Spieler:', players.value);
+});
+
+const matches = ref([])
 const teamA = ref([])
 const teamB = ref([])
 const teamAscore = ref(0)
@@ -23,7 +21,10 @@ const teamBscore = ref(0)
 const defaultA = []
 const defaultB = []
 
-const loadingSaveMatch = ref(false)
+const loadingSaveMatch = ref(false);
+const overlayHeadline = ref('Neues Match eintragen');
+const editMatch = ref(false);
+const currentMatchId = ref(null);
 
 function closeDialog() {
   matchDialog.value = false
@@ -36,7 +37,6 @@ function closeDialog() {
 async function saveDialog(a: Player[], aScore: number, b: Player[], bScore: number) {
   loadingSaveMatch.value = true
   try {
-    debugger
     const score = new FinalScore([...teamA.value], teamAscore.value, [...teamB.value], teamBscore.value);
     matches.value.push(score)
   } catch (e) {
@@ -46,6 +46,41 @@ async function saveDialog(a: Player[], aScore: number, b: Player[], bScore: numb
     loadingSaveMatch.value = false
   }
 }
+
+const handleOpenOverlayNewMatch = () => {
+  editMatch.value = false;
+  overlayHeadline.value = 'Neues Match eintragen';
+};
+
+const handleOpenOverlay = (newHeadline, score) => {
+  editMatch.value = true;
+  overlayHeadline.value = newHeadline;
+  currentMatchId.value = score.id;
+  teamAscore.value = score.aScore;
+  teamBscore.value = score.bScore;
+  teamA.value = score.aPlayers;
+  teamB.value = score.bPlayers;
+  matchDialog.value=true;
+};
+
+const deleteMatch= () => {
+  if (currentMatchId.value) {
+    console.log('Match mit ID', currentMatchId.value, 'wird entfernt.');
+    // Hier die Logik zum Entfernen des Matches aus deiner "matches"-Liste
+    // Beispiel: Filtern der Liste
+    matches.value = matches.value.filter(match => match.id !== currentMatchId.value);
+
+    // Optional: API-Call, um das Match auch vom Server zu löschen
+    // await yourApiService.deleteMatch(currentMatchId.value);
+
+    // Dialog und Zustand schließen/zurücksetzen, nachdem das Match entfernt wurde
+    closeDialog(); // Schließt das Dialog und setzt alle related States zurück
+  } else {
+    console.warn('Keine Match-ID zum Entfernen verfügbar.');
+  }
+
+}
+  
 </script>
 
 <template>
@@ -67,8 +102,8 @@ async function saveDialog(a: Player[], aScore: number, b: Player[], bScore: numb
       </v-col>
       <v-col cols="6">
         <v-container>
-          <v-row dense>
-            <v-col dense>
+          <v-row density="comfortable">
+            <v-col density="comfortable">
               <v-dialog max-width="500" v-model="matchDialog" persistent>
                 <v-overlay
                     :model-value="loadingSaveMatch"
@@ -85,10 +120,11 @@ async function saveDialog(a: Player[], aScore: number, b: Player[], bScore: numb
                       text="Neues Match"
                       variant="flat"
                       block
+                      @click="handleOpenOverlayNewMatch()"
                   ></v-btn>
                 </template>
                 <v-card>
-                  <v-card-title><b>Neues Match eintragen</b></v-card-title>
+                  <v-card-title><b>{{ overlayHeadline }}</b></v-card-title>
                   <v-container density="comfortable">
                     <v-row>
                       <v-col>
@@ -105,6 +141,8 @@ async function saveDialog(a: Player[], aScore: number, b: Player[], bScore: numb
                             :inset="false"
                             variant="outlined"
                             v-model="teamAscore"
+                            :min="0"
+                            :max="6"
                         />
                       </v-col>
                     </v-row>
@@ -129,6 +167,8 @@ async function saveDialog(a: Player[], aScore: number, b: Player[], bScore: numb
                             :inset="false"
                             variant="outlined"
                             v-model="teamBscore"
+                            :min="0"
+                            :max="6"
                         />
                       </v-col>
                     </v-row>
@@ -141,15 +181,16 @@ async function saveDialog(a: Player[], aScore: number, b: Player[], bScore: numb
                   <v-card-actions>
                     <v-spacer />
                     <v-btn dense variant="outlined" color="alert" @click="closeDialog">Abbruch</v-btn>
-                    <v-btn dense variant="tonal" color="primary" @click="saveDialog(teamA, teamAscore, teamB, teamBscore)">Speichern</v-btn>
+                    <v-btn v-if="editMatch" dense variant="tonal" color="primary" @click="deleteMatch()">Löschen</v-btn>
+                    <v-btn dense variant="tonal" color="secondary" @click="saveDialog(teamA, teamAscore, teamB, teamBscore)">Speichern</v-btn>
                   </v-card-actions>
                 </v-card>
               </v-dialog>
             </v-col>
           </v-row>
-          <v-row dense>
-            <v-col dense>
-              <Scorecard v-for="score in matches" :score="score" class="mb-3"/>
+          <v-row density="comfortable">
+            <v-col density="comfortable">
+              <Scorecard @open-overlay="handleOpenOverlay" v-for="score in matches" :score="score" class="mb-3"/>
             </v-col>
           </v-row>
         </v-container>

@@ -1,3 +1,8 @@
+# before you start
+
+necessary dependencies:
+-   uuid:  npm install uuid && npm install -D @types/uuid
+
 # Casual Cup - The open tournament planning tool
 
 Casual Cup aims to create accessible, low friction tournaments in a casual setting. 

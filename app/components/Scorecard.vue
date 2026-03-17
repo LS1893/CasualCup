@@ -3,7 +3,16 @@ import {FinalScore} from "~/domain/match/FinalScore.ts";
 
 const props = defineProps({
   score: { type: FinalScore, required: true },
+  loadingSaveMatch: Boolean
 })
+
+const emit = defineEmits(['open-overlay']);
+
+
+const openOverlayWithDifferentHeadline = () => {
+  emit('open-overlay', 'Match bearbeiten', props.score);
+}
+
 </script>
 
 <template>
@@ -18,7 +27,14 @@ const props = defineProps({
             {{ score.aScore }} : {{ score.bScore }}
           </v-chip>
         </v-col>
-        <v-col cols="2" />
+        <v-col cols="2" class="text-end">
+            <v-btn 
+              icon="mdi-pencil" 
+              variant="text" 
+              density="comfortable" 
+              @click="openOverlayWithDifferentHeadline()"
+            />
+        </v-col>
       </v-row>
       <v-row class="my-1">
         <v-col class="my-1">
@@ -27,16 +43,16 @@ const props = defineProps({
       </v-row>
       <v-row class="mt-2">
         <v-col cols="6">
-          <v-row dense>
-            <v-col dense><b>Team A:</b></v-col>
+          <v-row density="comfortable">
+            <v-col density="comfortable"><b>Team A:</b></v-col>
           </v-row>
-          <v-row dense class="my-1" v-for="player in score.aPlayers">{{ player.name }}</v-row>
+          <v-row density="comfortable" class="my-1" v-for="player in score.aPlayers">{{ player.name }}</v-row>
         </v-col>
         <v-col cols="6">
-          <v-row dense>
-            <v-col dense><b>Team B:</b></v-col>
+          <v-row density="comfortable">
+            <v-col density="comfortable"><b>Team B:</b></v-col>
           </v-row>
-          <v-row dense class="my-1" v-for="player in score.bPlayers">{{ player.name }}</v-row>
+          <v-row density="comfortable" class="my-1" v-for="player in score.bPlayers">{{ player.name }}</v-row>
         </v-col>
       </v-row>
     </v-container>

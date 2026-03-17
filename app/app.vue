@@ -7,12 +7,13 @@
         
         <v-container>
           <v-row>
-            <v-col cols="4"><v-img src="/images/CasualCup.png"
+            <v-col cols="2"><v-img src="/images/CasualCup.png"
               alt="Logo"
               max-width="120"
               contain/>
             </v-col>
-            <v-col cols="8"><EditableHeadline/></v-col>
+            <v-col cols="8" class="text-center"><EditableHeadline/></v-col>
+            <v-col cols="2"/>
           </v-row>
         </v-container>
       </v-app-bar-title>
