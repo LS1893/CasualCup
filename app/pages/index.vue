@@ -5,7 +5,7 @@ import Scorecard from "~/components/Scorecard.vue";
 import { initParser } from '~/composables/playerService';
 
 const matchDialog = ref(false)
-const { headers, items} = calculateScoreTable()
+const { headers, rankingList} = calculateScoreTable()
 const players = ref([]);
 
 onMounted(() => {
@@ -26,19 +26,34 @@ const overlayHeadline = ref('Neues Match eintragen');
 const editMatch = ref(false);
 const currentMatchId = ref(null);
 
+
+// error constants
+const scoreError = ref('ungültiges Ergebnis');
+const teamError = ref('Teamauswahl inkorrekt');
+const currentErrorMsg = ref('');
+
+
 function closeDialog() {
   matchDialog.value = false
   teamA.value = [...defaultA]
   teamAscore.value = 0
   teamB.value = [...defaultB]
   teamBscore.value = 0
+  currentErrorMsg.value = '';
 }
 
 async function saveDialog(a: Player[], aScore: number, b: Player[], bScore: number) {
   loadingSaveMatch.value = true
+  if(!validateMatchData()){
+      console.log(currentErrorMsg.value);
+      loadingSaveMatch.value = false;
+      return;
+    }
   try {
     const score = new FinalScore([...teamA.value], teamAscore.value, [...teamB.value], teamBscore.value);
     matches.value.push(score)
+    calculateScoreTable(players, matches);
+
   } catch (e) {
     // TODO print error, maybe use snackbar
   } finally {
@@ -66,21 +81,47 @@ const handleOpenOverlay = (newHeadline, score) => {
 const deleteMatch= () => {
   if (currentMatchId.value) {
     console.log('Match mit ID', currentMatchId.value, 'wird entfernt.');
-    // Hier die Logik zum Entfernen des Matches aus deiner "matches"-Liste
-    // Beispiel: Filtern der Liste
     matches.value = matches.value.filter(match => match.id !== currentMatchId.value);
 
-    // Optional: API-Call, um das Match auch vom Server zu löschen
-    // await yourApiService.deleteMatch(currentMatchId.value);
-
-    // Dialog und Zustand schließen/zurücksetzen, nachdem das Match entfernt wurde
-    closeDialog(); // Schließt das Dialog und setzt alle related States zurück
+    closeDialog();
   } else {
     console.warn('Keine Match-ID zum Entfernen verfügbar.');
   }
 
 }
   
+const validateMatchData = () => {
+  currentErrorMsg.value = '';
+  let isValid = true;
+  
+  if((teamAscore.value + teamBscore.value > 12  ||  teamAscore.value + teamBscore.value < 6) ||
+      (teamBscore.value != 6 && teamAscore.value != 6)){
+        isValid = false;
+        currentErrorMsg.value = scoreError.value;
+  }
+
+const allPlayersInGame = [...teamA.value, ...teamB.value];
+const playerIdsInGame = new Set();
+
+for (const player of allPlayersInGame) {
+    if (playerIdsInGame.has(player.id)) {
+        const duplicatePlayer = players.value.find(p => p.id === player.id);
+        if (duplicatePlayer) {
+          currentErrorMsg.value = teamError.value;
+          isValid = false;
+          break;
+        } 
+    }
+    playerIdsInGame.add(player.id);
+}
+
+  if(allPlayersInGame.length != 4){
+    isValid = false;
+    currentErrorMsg.value = teamError.value;
+  }
+
+  return isValid;
+}
 </script>
 
 <template>
@@ -91,8 +132,10 @@ const deleteMatch= () => {
           <v-row>
             <v-col>
               <v-data-table
+                  :sort-by="[{ key: 'rating', order: 'desc' }]"
+                  disable-sort
                   :headers="headers"
-                  :items="items"
+                  :items="rankingList"
                   class="elevation-1"
                   hide-default-footer
               />
@@ -111,7 +154,7 @@ const deleteMatch= () => {
                     scrim="#036358"
                     contained
                 >
-                  <v-progress-circular indeterminate />
+                <v-progress-circular indeterminate />
                 </v-overlay>
                 <template v-slot:activator="{ props: activatorProps }">
                   <v-btn
@@ -124,6 +167,20 @@ const deleteMatch= () => {
                   ></v-btn>
                 </template>
                 <v-card>
+                  <!-- Error message for match validation -->
+                  <v-alert
+                    v-if="currentErrorMsg"
+                    type="error"
+                    variant="tonal"
+                    class="mb-4"
+                    density="comfortable"
+                    closable
+                    icon="mdi-alert"
+                  >
+                    <v-alert-title>Validierungsfehler!</v-alert-title>
+                    {{ currentErrorMsg }}
+                  </v-alert>
+
                   <v-card-title><b>{{ overlayHeadline }}</b></v-card-title>
                   <v-container density="comfortable">
                     <v-row>
@@ -160,9 +217,10 @@ const deleteMatch= () => {
                     <v-row class="mt-2">
                       <v-col>
                         <v-number-input
+                            ref="teamBSelectRef"
                             reverse
                             controlVariant="default"
-                            label="Score Team A"
+                            label="Score Team B"
                             :hideInput="false"
                             :inset="false"
                             variant="outlined"
@@ -174,7 +232,7 @@ const deleteMatch= () => {
                     </v-row>
                     <v-row density="comfortable" class="mt-2">
                       <v-col density="comfortable">
-                        <v-select v-model="teamB" :items="players" multiple return-object item-title="name" :label="`Team B Spieler`"></v-select>
+                        <v-select v-model="teamB" :items="players" multiple :max-values="2" return-object item-title="name" :label="`Team B Spieler`"></v-select>
                       </v-col>
                     </v-row>
                   </v-container>
