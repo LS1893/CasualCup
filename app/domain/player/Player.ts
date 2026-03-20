@@ -18,4 +18,5 @@ export class Player {
     static fromPlainObject(obj: any): Player {
         return new Player(obj.id, obj.name, 1000);
     }
+
 }

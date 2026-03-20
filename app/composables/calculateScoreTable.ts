@@ -5,42 +5,68 @@ import { Player } from '~/domain/player/Player';
 
 export function calculateScoreTable(players: Player[], matches: FinalScore[]) {
 
-  //onsole.log('Inside calculateScoreTable, matches received:', matches);
+  const playerMap = new Map<number, Player>();
+  for (const player of players) {
+    playerMap.set(player.id, player);
+  }
+
+  for (const player of players) {
+    player.matches = 0;
+    player.rating = 1000;
+  }
 
 
-
-  const playerScores = new Set();
+  const involvedPlayerIds = new Set<number>();
 
 
   for (const match of matches) {
-    let aPlayer1 = match.aPlayers[0];
-    let aPlayer2 = match.aPlayers[1];
-    let bPlayer1 = match.aPlayers[0];
-    let bPlayer2 = match.aPlayers[1];
+    const playersInThisMatch: Player[] = [];
 
-    console.log('score before: ' + aPlayer1?.name + ', ' + aPlayer1?.rating);
 
-    adjustEloRatings(match);
+    const processPlayer = (playerData: Player) => {
+      const globalPlayer = playerMap.get(playerData.id);
+      if (globalPlayer) {
 
-    console.log('score after: ' + aPlayer1?.name + ', ' + aPlayer1?.rating);
+        globalPlayer.matches += 1;
+        involvedPlayerIds.add(globalPlayer.id);
 
+        playersInThisMatch.push(globalPlayer);
+      } else {
+        console.warn(`Spieler mit ID ${playerData.id} nicht in der globalen Spielerliste gefunden.`);
+      }
+    };
+    for (const player of match.aPlayers) {
+      processPlayer(player);
+    }
+    for (const player of match.bPlayers) {
+      processPlayer(player);
+    }
+
+    const matchForEloCalculation = new FinalScore(
+      match.id,
+      playersInThisMatch.slice(0, match.aPlayers.length),
+      match.aScore,
+      playersInThisMatch.slice(match.aPlayers.length),
+      match.bScore
+    );
+
+
+    adjustEloRatings(matchForEloCalculation);
   }
 
 
-
-
-
-  const rankingList = [
-    { name: 'Player 2', position: 2, matches: 3, rating: '1405' },
-    { name: 'Player 1', position: 1, matches: 3, rating: '1350' },
-    { name: 'Player 3', position: 3, matches: 3, rating: '960' }
-  ]
-
-  console.log('1. Inside calculateScoreTable - RETURNED:', rankingList);
-  console.log('1. Inside calculateScoreTable - RETURNED TYPE:', typeof rankingList);
-  console.log('1. Inside calculateScoreTable - IS ARRAY?:', Array.isArray(rankingList));
-
-  return {
-    rankingList
+  const activePlayers: Player[] = [];
+  for (const playerId of involvedPlayerIds) {
+    const player = playerMap.get(playerId);
+    if (player) {
+      activePlayers.push(player);
+    }
   }
+
+
+  activePlayers.sort((a, b) => b.rating - a.rating);
+
+
+
+  return activePlayers;
 }

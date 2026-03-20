@@ -14,12 +14,8 @@ const players = ref([]);
     { title: 'Punktzahl', key: 'rating' }
   ]
 const rankingList = ref<any[]>([]);
-
-onMounted(() => {
-  players.value = initParser.parseInitPlayers();
-  console.log('Initial geladene Spieler:', players.value);
-});
-
+const RANKING_STORAGE_KEY = 'playerRankingList';
+const MATCHES_STORAGE_KEY = 'matches';
 const teamA = ref([])
 const teamB = ref([])
 const teamAscore = ref(0)
@@ -32,11 +28,46 @@ const overlayHeadline = ref('Neues Match eintragen');
 const editMatch = ref(false);
 const currentMatchId = ref(null);
 
-
 // error constants
 const scoreError = ref('ungültiges Ergebnis');
 const teamError = ref('Teamauswahl inkorrekt');
 const currentErrorMsg = ref('');
+
+
+onMounted(() => {
+  players.value = initParser.parseInitPlayers();
+  console.log('Initial geladene Spieler:', players.value);
+
+  // read ranking from localStorage
+  if (process.client) {
+    const storedMatches = localStorage.getItem(MATCHES_STORAGE_KEY);
+
+    if (storedMatches) {
+      try {
+        const parsedMatches = JSON.parse(storedMatches);
+        matches.value = parsedMatches.map((matchData: any) => FinalScore.fromJSON(matchData));
+        const newRankingData = calculateScoreTable(players.value, matches.value);
+        rankingList.value = newRankingData;
+      } catch (e) {
+        console.error("Fehler beim Parsen der Spiele aus localStorage:", e);
+        matches.value = [];
+      }
+    } else {}
+     
+  }
+    
+});
+
+watch(matches, (newMatches) => {
+  if (process.client) {
+    try {
+      localStorage.setItem(MATCHES_STORAGE_KEY, JSON.stringify(newMatches));
+      console.log('Spiele im localStorage aktualisiert.');
+    } catch (e) {
+      console.error("Fehler beim Speichern der Spiele in localStorage:", e);
+    }
+  }
+}, { deep: true });
 
 
 function closeDialog() {
@@ -56,27 +87,15 @@ async function saveDialog(a: Player[], aScore: number, b: Player[], bScore: numb
       return;
     }
   try {
-    const score = new FinalScore([...teamA.value], teamAscore.value, [...teamB.value], teamBscore.value);
+    const score = new FinalScore("", [...teamA.value], teamAscore.value, [...teamB.value], teamBscore.value);
     matches.value.push(score)
     const newRankingData = calculateScoreTable(players.value, matches.value);
 
-    console.log('2. In saveDialog - After calculateScoreTable call - RESULT:', resultFromCalculation);
-    console.log('2. In saveDialog - After calculateScoreTable call - TYPE:', typeof resultFromCalculation);
-    console.log('2. In saveDialog - After calculateScoreTable call - IS ARRAY?:', Array.isArray(resultFromCalculation));
-
-    rankingList.value = newRankingData
-
-    console.log('3. In saveDialog - After rankingList.value assignment - rankingList.value:', rankingList.value);
-    console.log('3. In saveDialog - After rankingList.value assignment - TYPE:', typeof rankingList.value);
-    console.log('3. In saveDialog - After rankingList.value assignment - IS ARRAY?:', Array.isArray(rankingList.value));
-    console.log('3. In saveDialog - After rankingList.value assignment - LENGTH:', rankingList.value.length);
-
-
-    console.log(rankingList.value);
+    rankingList.value = newRankingData;
     
   } catch (e) {
     // TODO print error, maybe use snackbar
-    console.log('ERROR: ' + rankingList);
+    console.log('ERROR: ' + e);
   } finally {
     closeDialog();
     loadingSaveMatch.value = false
@@ -154,13 +173,12 @@ for (const player of allPlayersInGame) {
             <v-col>
               <v-data-table
                   :sort-by="[{ key: 'rating', order: 'desc' }]"
-                  disable-sort
                   :headers="headers"
-                  :items="rankingList.value"
+                  :items="rankingList"
                   class="elevation-1"
                   hide-default-footer
                   no-data-text="Es wurden noch keine Spiele gespielt"
-                  item-key="name"
+                  item-key="id"
               />
             </v-col>
           </v-row>
