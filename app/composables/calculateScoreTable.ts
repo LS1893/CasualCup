@@ -2,6 +2,7 @@ import { ref } from 'vue'
 import { FinalScore } from '~/domain/match/FinalScore';
 import { adjustEloRatings } from "~/domain/elo/EloUtil"
 import { Player } from '~/domain/player/Player';
+import { ELO_INITIAL_RATING } from '~/config/MatchOptions';
 
 export function calculateScoreTable(players: Player[], matches: FinalScore[]) {
 
@@ -12,7 +13,7 @@ export function calculateScoreTable(players: Player[], matches: FinalScore[]) {
 
   for (const player of players) {
     player.matches = 0;
-    player.rating = 1000;
+    player.rating = ELO_INITIAL_RATING;
   }
 
 

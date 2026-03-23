@@ -15,6 +15,7 @@ Casual Cup aims to create accessible, low friction tournaments in a casual setti
 
 ![UI proposal](docs/img/ui-idea.png)
 
+CasualCup uses https://github.com/zlypher/elo-rating to calculate ELO-Scores.
 
 # Color palette
 

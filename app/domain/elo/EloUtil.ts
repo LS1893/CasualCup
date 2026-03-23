@@ -1,5 +1,6 @@
 import type { FinalScore } from "~/domain/match/FinalScore";
 import EloRating from "elo-rating";
+import { ELO_K_FACTOR } from '~/config/MatchOptions';
 
 
 export function adjustEloRatings(finalScore: FinalScore) {
@@ -15,7 +16,8 @@ export function adjustEloRatings(finalScore: FinalScore) {
         player.rating = EloRating.calculate(
             player.rating,
             finalScore.bAvgRating(),
-            finalScore.aWin()
+            finalScore.aWin(),
+            ELO_K_FACTOR
         ).playerRating
     })
 
@@ -23,7 +25,8 @@ export function adjustEloRatings(finalScore: FinalScore) {
         player.rating = EloRating.calculate(
             player.rating,
             finalScore.aAvgRating(),
-            finalScore.bWin()
+            finalScore.bWin(),
+            ELO_K_FACTOR
         ).playerRating
     })
 }

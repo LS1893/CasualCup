@@ -1,3 +1,11 @@
 
 @use 'toolbar';
 @use 'variables';
+
+.scorecards-scroll-area {
+  max-height: 800px;
+  overflow-y: auto;
+  padding-right: 16px;
+  padding-left: 8px;
+  padding-top: 8px;
+}

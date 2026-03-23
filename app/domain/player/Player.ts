@@ -1,3 +1,4 @@
+import { ELO_INITIAL_RATING } from '~/config/MatchOptions';
 export class Player {
     id: number;
     name: string;
@@ -8,7 +9,7 @@ export class Player {
         this.id = id;
         this.name = name;
         if (score == null) {
-            this.rating = 1000;
+            this.rating = ELO_INITIAL_RATING;
         } else {
             this.rating = score;
         }
@@ -16,7 +17,7 @@ export class Player {
     }
 
     static fromPlainObject(obj: any): Player {
-        return new Player(obj.id, obj.name, 1000);
+        return new Player(obj.id, obj.name, ELO_INITIAL_RATING);
     }
 
 }

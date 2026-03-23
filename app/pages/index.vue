@@ -81,6 +81,9 @@ function closeDialog() {
 
 async function saveDialog(a: Player[], aScore: number, b: Player[], bScore: number) {
   loadingSaveMatch.value = true
+  if(editMatch){
+    matches.value = matches.value.filter(match => match.id !== currentMatchId.value);
+  }
   if(!validateMatchData()){
       console.log(currentErrorMsg.value);
       loadingSaveMatch.value = false;
@@ -90,7 +93,6 @@ async function saveDialog(a: Player[], aScore: number, b: Player[], bScore: numb
     const score = new FinalScore("", [...teamA.value], teamAscore.value, [...teamB.value], teamBscore.value);
     matches.value.push(score)
     const newRankingData = calculateScoreTable(players.value, matches.value);
-
     rankingList.value = newRankingData;
     
   } catch (e) {
@@ -124,16 +126,16 @@ const deleteMatch= () => {
     matches.value = matches.value.filter(match => match.id !== currentMatchId.value);
 
     closeDialog();
+    const newRankingData = calculateScoreTable(players.value, matches.value);
+    rankingList.value = newRankingData;
   } else {
     console.warn('Keine Match-ID zum Entfernen verfügbar.');
   }
-
 }
   
 const validateMatchData = () => {
   currentErrorMsg.value = '';
   let isValid = true;
-  
   if((teamAscore.value + teamBscore.value > 12  ||  teamAscore.value + teamBscore.value < 6) ||
       (teamBscore.value != 6 && teamAscore.value != 6)){
         isValid = false;
@@ -197,16 +199,17 @@ for (const player of allPlayersInGame) {
                 >
                 <v-progress-circular indeterminate />
                 </v-overlay>
-                <template v-slot:activator="{ props: activatorProps }">
-                  <v-btn
-                      v-bind="activatorProps"
-                      color="surface-variant"
-                      text="Neues Match"
-                      variant="flat"
-                      block
-                      @click="handleOpenOverlayNewMatch()"
-                  ></v-btn>
-                </template>
+                  <template v-slot:activator="{ props: activatorProps }">
+                    <v-btn
+                        
+                        v-bind="activatorProps"
+                        color="accent"
+                        text="Neues Match"
+                        variant="flat"
+                        block
+                        @click="handleOpenOverlayNewMatch()"
+                    ></v-btn>
+                  </template>
                 <v-card>
                   <!-- Error message for match validation -->
                   <v-alert
@@ -281,15 +284,21 @@ for (const player of allPlayersInGame) {
                     <v-spacer />
                     <v-btn dense variant="outlined" color="alert" @click="closeDialog">Abbruch</v-btn>
                     <v-btn v-if="editMatch" dense variant="tonal" color="primary" @click="deleteMatch()">Löschen</v-btn>
-                    <v-btn dense variant="tonal" color="secondary" @click="saveDialog(teamA, teamAscore, teamB, teamBscore)">Speichern</v-btn>
+                    <v-btn v-if="!editMatch" dense variant="tonal" color="secondary" @click="saveDialog(teamA, teamAscore, teamB, teamBscore)">Speichern</v-btn>
+                    <v-btn v-if="editMatch" dense variant="tonal" color="secondary" @click="saveDialog(teamA, teamAscore, teamB, teamBscore)">Speichern</v-btn>
                   </v-card-actions>
                 </v-card>
               </v-dialog>
             </v-col>
           </v-row>
           <v-row density="comfortable">
+            <!-- style="border: 1px solid;" -->
             <v-col density="comfortable">
-              <Scorecard @open-overlay="handleOpenOverlay" v-for="score in matches" :score="score" class="mb-3"/>
+              <div class="scorecards-scroll-area">
+                <Scorecard @open-overlay="handleOpenOverlay" v-for="score in matches.slice().reverse()" :score="score" class="mb-3"/>
+
+              </div>
+              
             </v-col>
           </v-row>
         </v-container>
