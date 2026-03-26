@@ -164,6 +164,16 @@ for (const player of allPlayersInGame) {
 
   return isValid;
 }
+
+function getPlayerRowProps(item: any): any {
+  const player = item.internalItem.raw;
+  if (player.matches >= 3) {
+    return {
+      class: 'eligible-player-row'
+    };
+  }
+  return {};
+}
 </script>
 
 <template>
@@ -181,6 +191,7 @@ for (const player of allPlayersInGame) {
                   hide-default-footer
                   no-data-text="Es wurden noch keine Spiele gespielt"
                   item-key="id"
+                  :row-props="getPlayerRowProps"
               />
             </v-col>
           </v-row>
@@ -201,7 +212,9 @@ for (const player of allPlayersInGame) {
                 </v-overlay>
                   <template v-slot:activator="{ props: activatorProps }">
                     <v-btn
-                        
+                        rounded="0"
+                        height="56px" 
+                        class="elevation-1"
                         v-bind="activatorProps"
                         color="accent"
                         text="Neues Match"
@@ -294,10 +307,10 @@ for (const player of allPlayersInGame) {
           <v-row density="comfortable">
             <!-- style="border: 1px solid;" -->
             <v-col density="comfortable">
-              <div class="scorecards-scroll-area">
+              <!-- div class="scorecards-scroll-area"> -->
                 <Scorecard @open-overlay="handleOpenOverlay" v-for="score in matches.slice().reverse()" :score="score" class="mb-3"/>
 
-              </div>
+              <!-- </div> -->
               
             </v-col>
           </v-row>

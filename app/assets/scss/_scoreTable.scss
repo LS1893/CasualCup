@@ -1,0 +1,30 @@
+.v-data-table tbody tr.eligible-player-row {
+  //background-color: rgba(6, 214, 160, 0.05) !important;
+  box-shadow: inset 4px 0 0 #06D6A0;
+}
+
+.v-data-table > div > table > thead > tr > th {
+  //background-color: rgba(6, 214, 160, 0.1) !important;
+  background-color: #06D6A0 !important;
+  font-weight: bold !important;
+  //border-bottom: #333 2px solid;
+  font-size: 16px;
+}
+
+.v-data-table {
+  width: 100%;
+  table-layout: fixed;
+}
+
+.v-data-table tbody tr {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12) !important;
+}
+
+.v-data-table tbody tr > td {
+  padding: 8px 16px !important;
+  word-break: break-word;
+}
+
+.v-data-table tbody tr:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}

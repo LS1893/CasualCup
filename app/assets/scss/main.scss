@@ -1,6 +1,7 @@
 
 @use 'toolbar';
 @use 'variables';
+@use 'scoreTable';
 
 .scorecards-scroll-area {
   max-height: 800px;
@@ -8,4 +9,13 @@
   padding-right: 16px;
   padding-left: 8px;
   padding-top: 8px;
+}
+
+.v-btn__content {
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.v-button{
+    border-radius: 0px;
 }
