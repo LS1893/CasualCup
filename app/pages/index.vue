@@ -187,6 +187,7 @@ function getPlayerRowProps(item: any): any {
                   :sort-by="[{ key: 'rating', order: 'desc' }]"
                   :headers="headers"
                   :items="rankingList"
+                  items-per-page="30"
                   class="elevation-1"
                   hide-default-footer
                   no-data-text="Es wurden noch keine Spiele gespielt"
